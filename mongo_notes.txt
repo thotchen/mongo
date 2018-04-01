@@ -1,0 +1,114 @@
+shell connection info
+
+mongo "mongodb://cluster0-shard-00-00-jxeqq.mongodb.net:27017,cluster0-shard-00-01-jxeqq.mongodb.net:27017,cluster0-shard-00-02-jxeqq.mongodb.net:27017/test?replicaSet=Cluster0-shard-0" --authenticationDatabase admin --ssl --username m001-student --password m001-mongodb-basics
+
+use video //db
+show collections
+db.movies.find().pretty()
+
+m001-student
+m001-mongodb-basics
+
+mongo "mongodb+srv://cluster0-1pdqb.mongodb.net/test" --username m001-student --password m001-mongodb-basics
+
+load("loadMovieDetailsDataset.js")
+show dbs
+use video
+
+uri connection
+mongodb://m001-student:m001-mongodb-basics@cluster0-shard-00-00-1pdqb.mongodb.net:27017,cluster0-shard-00-01-1pdqb.mongodb.net:27017,cluster0-shard-00-02-1pdqb.mongodb.net:27017/admin?replicaSet=Cluster0-shard-0&ssl=true
+
+show collections
+db.moviesScratch.find().pretty()
+
+
+db.moviesScratch.insertOne({"_id" : "tt0084726", "title" : "Star Trek II: The Wrath of Khan", "year" : 1982, "imdb" : "tt0084726"})
+db.moviesScratch.insertMany([{"_id" : "00", "title" : "00" },{"_id" : "01", "title" : "02"}])
+
+
+{mpaaRating : "PG-13"}
+db.movies.find({mpaaRating : "PG-13", year : 2009}).pretty()
+use 100YWeatherSmall
+db.data.find({"wind.direction.angle" : 290}).pretty()
+
+db.movieDetails.find({'awards.nominations': 2, 'awards.wins': 2}).count()
+db.movies.find({'cast' : ["Jeff Bridges", "Tim Robbins"]}).pretty()
+db.movies.find({'title' : 'Arlington Road'}).pretty()
+db.movies.find({'cast' : 'Jeff Bridges'}).pretty()
+db.movies.find({'cast' : 'Jeff Bridges'}).count() = 114
+db.movies.find({'cast.0' : 'Jeff Bridges'}).count() = 56
+db.movieDetails.find({'writers' : ["Ethan Coen", "Joel Coen"]}).count() = 1
+db.movieDetails.find({'genres' : 'Family'}).count() = 124
+db.movieDetails.find({'genres.1' : 'Western'}).count() = 14
+
+Projections 1 = include 0 = exclude fields
+db.movies.find({genre : "Action, Adventure"}, {title: 1})
+db.movies.find({genre : "Action, Adventure"}, {title: 1, _id: 0})
+
+
+db.movieDetails.updateOne({
+    title : "The Martian"
+    },{
+    $set :{
+        poster : "https://images-na.ssl-images-amazon.com/images/M/MV5BYmM4NzYyNjAtYWUzNy00ZTgzLWE3ZjAtZmQ5N2M1YjIzN2UxXkEyXkFqcGdeQXVyNTIzOTk5ODM@._V1_SY1000_CR0,0,676,1000_AL_.jpg"
+    }
+})
+
+db.movieDetails.updateOne({
+    title : "The Martian"
+    },{
+    $set :{
+        awards : {
+            wins : 8,
+            nominations : 14,
+            "text" : "Nominated for 3 Golden Globes. Another 8 wins & 14 nominations"
+        }
+    }
+})
+
+https://docs.mongodb.com/manual/reference/operator/update/
+
+db.movieDetails.updateOne({
+    title : "The Martian"
+    },{
+    $inc :{
+        "tomato.reviews" : 3,
+        "tomato.userReviews" : 25
+    }
+})
+db.movieDetails.find({title: "The Martian"},{tomato : 1}).pretty()
+
+db.movieDetails.updateMany({
+  rated : null
+  },{
+    $unset : {
+      rated : ""
+    }
+})
+
+
+detailDoc = db.movieDetails.findOne({"imdb.id" : "tt4368814"});
+detailDoc.poster;
+detailDoc.poster = "http://www.google.com";
+detailDoc.genres;
+detailDoc.genres.push("Documentary");
+db.movieDetails.replaceOne({"imdb.id" : detailDoc.imdb.id},detailDoc);
+
+mongo "mongodb+srv://cluster0-1pdqb.mongodb.net/video" --username m001-student --password m001-mongodb-basics ./m001-basics/loadReviewsDataset.js
+db.reviews.findOne({"_id" : ObjectId("5a806be3897caa5b4c58715f")});
+db.reviews.deleteOne({"_id" : ObjectId("5a806be3897caa5b4c58715f")});
+db.reviews.deleteMany({reviewer_id :759723314});
+
+db.movieDetails.find({runtime: {$gt: 90}},{title : 1, runtime: 1, _id: 0}).pretty();
+db.movieDetails.find({runtime: {$gt: 90, $lt: 120}},{title : 1, runtime: 1, _id: 0}).pretty();
+
+db.movieDetails.find({runtime: {$gte: 90, $lte: 120}, "tomato.meter": {$gte: 95}},{title : 1, runtime:1,_id: 0}).count();
+db.movieDetails.find({rated: {$in : "UNRATED"}},{title : 1, runtime:1,rated: 1,_id: 0}).pretty();
+db.movieDetails.find({rated: {$in : ["G","PG"]}},{title : 1, runtime:1,rated: 1,_id: 0}).pretty();
+db.movieDetails.find({rated: {$nin : ["G","PG", "PG-13"]}},{title : 1, runtime:1,rated: 1,_id: 0}).pretty();
+
+db.movieDetails.find({writers : {$in : ["Ethan Coen","Joel Coen"]}}).count();
+
+db.scores.find({results: {$elemMatch: {$gte: 70, $lt: 80}}}).count()
+
+db.movies.find({cast : {$in : ["Jack Nicholson", "John Huston"]}, viewerRating :{$gte:7},mpaaRating:"R"},{cast :1, viewerRating:1,mpaaRating:1,_id:0}).count()

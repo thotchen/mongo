@@ -1,0 +1,32 @@
+mongod --dbpath /c/SANDBOX/mongo/m101j/db/
+
+db.movies.find().pretty()
+
+mvn archetype:generate
+
+Add following to pom ...
+<properties>
+ <maven.compiler.source>1.8</maven.compiler.source>
+ <maven.compiler.target>1.8</maven.compiler.target>
+</properties>
+
+mvn clean compile exec:java -Dexec.mainClass=com.mongodb.App
+
+
+
+
+
+
+ObjectId: 12 byte HEX String
+4 bytes -> date (seconds since unix epoc)
+3 bytes -> mac address
+2 bytes -> pid
+3 bytes -> counter
+
+#Cursors
+var c = db.movieDetails.find()
+var doc = function() { return c.hasNext() ? c.next() : null;}
+c.objsLeftInBatch();
+
+db.movieDetails.find({runtime : {$gt:90,$lte:120}},{title:1, runtime:1,_id:0})
+db.movieDetails.find({rated : {$nin : ["PG", "PG-13"]}},{title:1, runtime:1,rated:1,_id:0})
